@@ -9,7 +9,7 @@ class Post(models.Model):
     content = models.TextField()
     time_posted = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete = models.CASCADE)#basically telling django to delete the post if the user gets deleted
-
+    #basically foreignkey is using other models. Here, we are using model User from users/models.
     def __str__(self):
         return self.title
 

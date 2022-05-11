@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.views.generic import (
 ListView,
 DetailView,
@@ -8,20 +10,29 @@ UpdateView,
 DeleteView
 )
 from .models import Post
-
-
-
 def home(request):
     context = {
-    'posts': Post.objects.all()
+    'posts': Post.objects.all()  #this is manager of models. making query to database.
     }
     return render(request, 'blog/home.html', context)
 
 class PostListView(ListView):
     model = Post
     template_name = 'blog/home.html'
-    context_object_name = 'posts'
+    context_object_name = 'posts'  #making names generic. would have to use .object in templates if not given this generic name
     ordering = ['-time_posted']
+    paginate_by = 4
+
+class UserPostListView(ListView):
+    model = Post
+    template_name = 'blog/user_posts.html'
+    context_object_name = 'posts'
+    paginate_by = 4
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username = self.kwargs.get('username'))
+        return Post.objects.filter(author=user).order_by('-time_posted')
+        
 
 class PostDetailView(DetailView):
     model = Post
